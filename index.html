@@ -10,7 +10,22 @@
   <title>일정 메모장</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-    html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f3f4f6;overflow:hidden;}
+
+    /* ── 1번 수정: 당겨서 새로고침 완전 비활성화 ── */
+    html{
+      overscroll-behavior:none;
+      overflow:hidden;
+      height:100%;
+    }
+    body{
+      overscroll-behavior:none;
+      overflow:hidden;
+      height:100%;
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      background:#f3f4f6;
+      touch-action:pan-y;
+    }
+
     .app{max-width:430px;margin:0 auto;height:100vh;display:flex;flex-direction:column;background:#fff;position:relative;overflow:hidden;}
     .status-bar{background:#4F46E5;color:#fff;font-size:12px;padding:env(safe-area-inset-top,10px) 20px 6px;display:flex;justify-content:space-between;flex-shrink:0;}
     .app-header{background:#4F46E5;padding:8px 20px 18px;color:#fff;flex-shrink:0;}
@@ -18,13 +33,20 @@
     .app-header p{font-size:12px;opacity:.8;margin-top:2px;}
     .gcal-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);border-radius:20px;padding:4px 10px;font-size:11px;margin-top:8px;}
     .gcal-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;}
-    .screen{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;flex-direction:column;}
+
+    /* ── 스크롤 가능한 화면 영역 ── */
+    .screen{
+      flex:1;
+      overflow-y:auto;
+      overflow-x:hidden;
+      -webkit-overflow-scrolling:touch;
+      overscroll-behavior:contain; /* 화면 내부 스크롤만 허용 */
+      display:none;
+      flex-direction:column;
+    }
     .screen.active{display:flex;}
+
     .body-area{padding:16px;display:flex;flex-direction:column;gap:12px;padding-bottom:80px;}
-    .notif-card{background:#EEF2FF;border-radius:14px;border:1px solid #C7D2FE;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;}
-    .notif-icon{font-size:18px;flex-shrink:0;}
-    .notif-text{font-size:13px;color:#3730A3;}
-    .notif-time{font-size:11px;color:#818CF8;margin-top:2px;}
     .memo-input-card{background:#fff;border-radius:14px;border:1px solid #e5e7eb;padding:14px;}
     .memo-input-card>label{font-size:12px;color:#6b7280;display:block;margin-bottom:6px;}
     textarea{width:100%;border:1px solid #d1d5db;border-radius:10px;padding:10px;font-size:15px;resize:none;height:85px;background:#f9fafb;color:#111827;font-family:inherit;line-height:1.5;}
@@ -61,12 +83,14 @@
     .event-btns{display:flex;flex-direction:column;gap:5px;align-items:flex-end;}
     .del-btn{background:none;border:1px solid #e5e7eb;border-radius:8px;padding:5px 9px;font-size:12px;cursor:pointer;color:#9ca3af;}
     .del-btn:active{border-color:#EF4444;color:#EF4444;}
-    .open-gcal-btn{background:#EEF2FF;border:1px solid #C7D2FE;border-radius:8px;padding:5px 9px;font-size:10px;color:#4338CA;white-space:nowrap;text-decoration:none;display:inline-block;cursor:pointer;}
+    .open-gcal-btn{background:#EEF2FF;border:1px solid #C7D2FE;border-radius:8px;padding:5px 9px;font-size:10px;color:#4338CA;white-space:nowrap;text-decoration:none;display:inline-block;cursor:pointer;border:none;}
     .open-gcal-btn:active{background:#C7D2FE;}
     .bottom-nav{background:#fff;border-top:1px solid #e5e7eb;display:flex;padding:10px 0 max(16px,env(safe-area-inset-bottom));flex-shrink:0;}
     .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:4px 0;}
     .nav-label{font-size:10px;color:#9ca3af;}
     .nav-btn.active .nav-label{color:#4F46E5;}
+
+    /* 캘린더 */
     .cal-screen{padding:16px;display:flex;flex-direction:column;gap:14px;padding-bottom:80px;}
     .cal-header{display:flex;align-items:center;justify-content:space-between;}
     .cal-month{font-size:17px;font-weight:600;color:#111827;}
@@ -74,23 +98,25 @@
     .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
     .cal-day-label{text-align:center;font-size:11px;color:#9ca3af;padding:4px 0;font-weight:500;}
     .cal-day{min-height:38px;border-radius:8px;display:flex;flex-direction:column;align-items:center;padding:4px 2px;cursor:pointer;}
-    .cal-day:hover{background:#f3f4f6;}
+    .cal-day:active{background:#f3f4f6;}
     .cal-day.today .cal-day-num{background:#4F46E5;color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;}
     .cal-day.selected{background:#EEF2FF;}
     .cal-day-num{font-size:13px;color:#111827;width:26px;height:26px;display:flex;align-items:center;justify-content:center;}
     .cal-day.other-month .cal-day-num{color:#d1d5db;}
     .cal-dot-row{display:flex;gap:2px;margin-top:1px;}
     .cal-dot{width:5px;height:5px;border-radius:50%;}
-    .cal-events-title{font-size:13px;font-weight:600;color:#6b7280;margin-top:4px;}
+    .cal-events-title{font-size:13px;font-weight:600;color:#6b7280;}
     .cal-event-item{background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;}
     .cal-event-dot{width:9px;height:9px;border-radius:50%;margin-top:3px;flex-shrink:0;}
     .cal-event-info{flex:1;}
     .cal-event-title{font-size:14px;font-weight:600;color:#111827;}
     .cal-event-time{font-size:12px;color:#6b7280;margin-top:1px;}
     .no-events{text-align:center;color:#9ca3af;font-size:13px;padding:20px 0;}
+
+    /* 모달 */
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end;justify-content:center;}
     .modal-overlay.show{display:flex;}
-    .modal-card{background:#fff;border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:430px;max-height:85vh;overflow-y:auto;}
+    .modal-card{background:#fff;border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:430px;max-height:85vh;overflow-y:auto;overscroll-behavior:contain;}
     .modal-title{font-size:16px;font-weight:600;color:#111827;margin-bottom:16px;}
     .form-group{margin-bottom:14px;}
     .form-label{font-size:12px;color:#6b7280;display:block;margin-bottom:6px;}
@@ -100,25 +126,23 @@
     .form-textarea:focus{outline:none;border-color:#4F46E5;}
     .modal-btns{display:flex;gap:8px;margin-top:16px;}
     .modal-save-btn{flex:1;background:#4F46E5;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;}
-    .modal-save-btn:active{background:#4338CA;}
     .modal-cancel-btn{background:#f3f4f6;color:#6b7280;border:1px solid #d1d5db;border-radius:10px;padding:12px 16px;font-size:14px;cursor:pointer;}
     .fab{position:fixed;bottom:80px;right:calc(50% - 215px + 16px);width:52px;height:52px;border-radius:50%;background:#4F46E5;color:#fff;border:none;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(79,70,229,.4);z-index:10;}
 
-    /* 구글 캘린더 등록 오버레이 */
+    /* 구글 캘린더 오버레이 */
     .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:flex-end;justify-content:center;}
     .overlay.show{display:flex;}
     .overlay-card{background:#fff;border-radius:20px 20px 0 0;padding:24px 20px;width:100%;max-width:430px;}
     .overlay-icon{font-size:36px;text-align:center;margin-bottom:10px;}
     .overlay-title{font-size:16px;font-weight:600;color:#111827;margin-bottom:6px;text-align:center;}
     .overlay-sub{font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.7;text-align:center;}
-    /* 앱으로 열기 버튼 - 크고 선명하게 */
     .gcal-app-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#1a73e8;color:#fff;border:none;border-radius:14px;padding:16px;font-size:16px;font-weight:600;text-decoration:none;margin-bottom:10px;cursor:pointer;}
     .gcal-app-btn:active{background:#1557b0;}
     .gcal-web-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:#f1f3f4;color:#3c4043;border:none;border-radius:14px;padding:13px;font-size:14px;font-weight:500;text-decoration:none;margin-bottom:10px;cursor:pointer;}
     .gcal-web-btn:active{background:#e2e5e9;}
-    .overlay-cancel{display:block;width:100%;background:none;color:#9ca3af;border:none;border-radius:10px;padding:10px;font-size:14px;cursor:pointer;text-align:center;}
+    .overlay-cancel{display:block;width:100%;background:none;color:#9ca3af;border:none;padding:10px;font-size:14px;cursor:pointer;text-align:center;}
 
-    /* 인앱 팝업 알림 */
+    /* 인앱 알림 */
     .popup-notif{position:fixed;top:-80px;left:50%;transform:translateX(-50%);background:#1E1B4B;color:#fff;border-radius:14px;padding:12px 16px;min-width:280px;max-width:360px;z-index:300;transition:top .35s cubic-bezier(.175,.885,.32,1.275);pointer-events:none;display:flex;gap:10px;align-items:flex-start;}
     .popup-notif.show{top:24px;pointer-events:auto;}
     .popup-notif-icon{font-size:18px;flex-shrink:0;}
@@ -126,6 +150,10 @@
     .popup-notif-sub{font-size:11px;opacity:.8;margin-top:2px;}
     .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#1E1B4B;color:#fff;font-size:13px;padding:9px 18px;border-radius:20px;white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
     .toast.show{opacity:1;}
+
+    /* 업데이트 배너 */
+    .update-banner{display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#16A34A;color:#fff;padding:10px 16px;font-size:13px;font-weight:500;text-align:center;z-index:400;cursor:pointer;}
+    .update-banner.show{display:block;}
   </style>
 </head>
 <body>
@@ -142,10 +170,9 @@
     </div>
   </div>
 
-  <!-- 홈 화면 -->
+  <!-- 홈 -->
   <div class="screen active" id="screen-home">
     <div class="body-area">
-      <div id="notif-area"></div>
       <div class="memo-input-card">
         <label>일정 메모 입력</label>
         <textarea id="memo-input" placeholder="예: 내일 오후 2시에 치과 예약&#10;예: 5월 3일 팀 미팅 오전 10시 강남"></textarea>
@@ -183,7 +210,7 @@
     </div>
   </div>
 
-  <!-- 캘린더 화면 -->
+  <!-- 캘린더 -->
   <div class="screen" id="screen-cal">
     <div class="cal-screen">
       <div class="cal-header">
@@ -211,30 +238,24 @@
       <svg width="22" height="22" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
       <span class="nav-label">알림</span>
     </button>
-    <button class="nav-btn" id="nav-set" onclick="switchTab('home')">
+    <button class="nav-btn">
       <svg width="22" height="22" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
       <span class="nav-label">설정</span>
     </button>
   </div>
 </div>
 
-<!-- 구글 캘린더 등록 오버레이 -->
+<!-- 구글 캘린더 오버레이 -->
 <div class="overlay" id="overlay">
   <div class="overlay-card">
     <div class="overlay-icon">📅</div>
     <div class="overlay-title" id="overlay-title">구글 캘린더에 등록하기</div>
-    <div class="overlay-sub" id="overlay-sub">구글 캘린더 앱으로 열면<br>제목·날짜·시간이 자동으로 채워져요.<br>저장 버튼만 누르면 등록 완료!</div>
-    <!-- 앱으로 열기 (안드로이드 인텐트) -->
-    <a id="gcal-app-btn" class="gcal-app-btn" href="#">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="4" width="18" height="18" rx="2" fill="#fff" fill-opacity="0.2" stroke="#fff" stroke-width="1.5"/>
-        <path d="M16 2v4M8 2v4M3 10h18" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
-        <path d="M8 15h2v2H8zm3 0h2v2h-2zm3 0h2v2h-2z" fill="#fff"/>
-      </svg>
+    <div class="overlay-sub">구글 캘린더 앱이 열리면서<br>제목·날짜·시간이 자동으로 채워져요.<br>저장 버튼만 누르면 등록 완료!</div>
+    <button class="gcal-app-btn" id="gcal-app-btn" onclick="openGcalApp()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
       구글 캘린더 앱으로 열기
-    </a>
-    <!-- 웹으로 열기 (백업) -->
-    <a id="gcal-web-btn" class="gcal-web-btn" href="#">
+    </button>
+    <a id="gcal-web-btn" class="gcal-web-btn" href="#" target="_blank" rel="noopener">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3c4043" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg>
       웹 브라우저로 열기
     </a>
@@ -277,15 +298,24 @@
     <div class="popup-notif-sub" id="popup-notif-sub"></div>
   </div>
 </div>
+
+<!-- 업데이트 배너 -->
+<div class="update-banner" id="update-banner" onclick="location.reload()">
+  🔄 새 버전이 있어요 — 탭해서 업데이트
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
+const APP_VERSION = '1.0.5';
 const COLORS=['#4F46E5','#0891B2','#16A34A','#D97706','#7C3AED','#DC2626'];
-let colorIdx=0,events=[],calYear=new Date().getFullYear(),calMonth=new Date().getMonth(),selectedDate=null,pendingEvent=null;
+let colorIdx=0, events=[], calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), selectedDate=null, currentGcalParams=null;
 
+// ── 저장/불러오기 ──
 function saveEvents(){localStorage.setItem('memo_events',JSON.stringify(events));}
 function loadEvents(){try{const d=localStorage.getItem('memo_events');if(d)events=JSON.parse(d);}catch(e){events=[];}}
 
+// ── 탭 전환 ──
 function switchTab(tab){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
@@ -310,7 +340,6 @@ function switchTab(tab){
 
 function toggleChip(el){el.classList.toggle('selected');}
 function getSelectedAlerts(id){return[...document.querySelectorAll(`#${id} .chip.selected`)].map(c=>({val:c.dataset.val,min:parseInt(c.dataset.min)}));}
-
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 function showPopupNotif(title,sub){
   document.getElementById('popup-notif-title').textContent=title;
@@ -323,8 +352,7 @@ function showPopupNotif(title,sub){
 function scheduleNotifs(ev){
   if(!ev.alerts)return;
   ev.alerts.forEach(a=>{
-    const d=parseEventDate(ev.date,ev.time);
-    if(!d)return;
+    const d=parseEventDate(ev.date,ev.time);if(!d)return;
     const delay=new Date(d.getTime()-a.min*60000).getTime()-Date.now();
     if(delay>0&&delay<7*24*3600000)setTimeout(()=>showPopupNotif(`🔔 ${ev.title}`,`${a.val} 알림`),delay);
   });
@@ -332,42 +360,62 @@ function scheduleNotifs(ev){
 
 function parseEventDate(dateStr,timeStr){
   try{
-    const now=new Date();
-    let yr=now.getFullYear(),mo=now.getMonth()+1,dy=now.getDate();
+    const now=new Date();let yr=now.getFullYear(),mo=now.getMonth()+1,dy=now.getDate();
     if(/내일/.test(dateStr)){const t=new Date(now);t.setDate(t.getDate()+1);mo=t.getMonth()+1;dy=t.getDate();}
     else{const dm=dateStr.match(/(\d{1,2})월\s*(\d{1,2})일/);if(dm){mo=parseInt(dm[1]);dy=parseInt(dm[2]);}}
     let h=9,m=0;
     const am=timeStr.match(/오전\s*(\d+):(\d+)/),pm=timeStr.match(/오후\s*(\d+):(\d+)/);
-    if(am){h=parseInt(am[1]);m=parseInt(am[2]);}
-    else if(pm){h=parseInt(pm[1])+12;m=parseInt(pm[2]);if(h>=24)h=23;}
+    if(am){h=parseInt(am[1]);m=parseInt(am[2]);}else if(pm){h=parseInt(pm[1])+12;m=parseInt(pm[2]);if(h>=24)h=23;}
     return new Date(yr,mo-1,dy,h,m);
   }catch(e){return null;}
 }
 
-// ── 구글 캘린더 URL 빌더 ──
-function buildGCalURLs(title,dateStr,timeStr,location,memo){
+// ── 2번 수정: 구글 캘린더 앱 인텐트 URL ──
+function buildGCalParams(title,dateStr,timeStr,location,memo){
   const d=parseEventDate(dateStr,timeStr)||new Date();
   const pad=n=>String(n).padStart(2,'0');
   const fmt=dt=>`${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}T${pad(dt.getHours())}${pad(dt.getMinutes())}00`;
   const end=new Date(d.getTime()+3600000);
   let details='일정 메모장 앱에서 등록됨';
   if(memo)details+='\n'+memo;
-  const params=`action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${fmt(d)}/${fmt(end)}&details=${encodeURIComponent(details)}${location?`&location=${encodeURIComponent(location)}`:''}`;
   return {
-    // 안드로이드 구글 캘린더 앱 인텐트 URL
-    app: `intent://com.google.android.calendar/time/action=INSERT&${params}#Intent;scheme=content;package=com.google.android.calendar;end`,
-    // 모바일 웹 버전 (앱 없을 때 백업)
-    web: `https://calendar.google.com/calendar/r/eventedit?${params}`
+    title, dates:`${fmt(d)}/${fmt(end)}`, details,
+    location: location||'',
+    webURL:`https://calendar.google.com/calendar/r/eventedit?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${fmt(d)}/${fmt(end)}&details=${encodeURIComponent(details)}${location?`&location=${encodeURIComponent(location)}`:''}`
   };
 }
 
+function openGcalApp(){
+  if(!currentGcalParams)return;
+  const p=currentGcalParams;
+  // 안드로이드 구글 캘린더 앱 정확한 인텐트
+  const intentURL=`intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/event;S.title=${encodeURIComponent(p.title)};S.dtstart=${p.dates.split('/')[0]};S.dtend=${p.dates.split('/')[1]};S.description=${encodeURIComponent(p.details)};S.eventLocation=${encodeURIComponent(p.location)};package=com.google.android.calendar;end`;
+  // fallback: 앱이 응답 없으면 웹으로
+  const start=Date.now();
+  window.location.href=intentURL;
+  setTimeout(()=>{
+    if(Date.now()-start<2000){
+      // 앱이 열리지 않으면 웹으로 이동
+      document.getElementById('gcal-web-btn').click();
+    }
+  },1500);
+}
+
+function openGcalOverlay(title,date,time,location,memo){
+  currentGcalParams=buildGCalParams(title,date,time,location,memo);
+  document.getElementById('overlay-title').textContent=`"${title}" 등록하기`;
+  document.getElementById('gcal-web-btn').href=currentGcalParams.webURL;
+  document.getElementById('overlay').classList.add('show');
+}
+function closeOverlay(){document.getElementById('overlay').classList.remove('show');showToast('일정이 저장됐어요!');}
+document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)closeOverlay();});
+
+// ── 홈 렌더 ──
 function renderHomeEvents(){
-  const list=document.getElementById('events-list');
-  list.innerHTML='';
-  if(events.length===0){list.innerHTML='<div style="text-align:center;color:#9ca3af;font-size:13px;padding:20px 0">등록된 일정이 없어요</div>';return;}
+  const list=document.getElementById('events-list');list.innerHTML='';
+  if(!events.length){list.innerHTML='<div style="text-align:center;color:#9ca3af;font-size:13px;padding:20px 0">등록된 일정이 없어요</div>';return;}
   [...events].reverse().forEach((ev,ri)=>{
     const i=events.length-1-ri;
-    const urls=buildGCalURLs(ev.title,ev.date,ev.time,ev.location,ev.memo);
     const card=document.createElement('div');card.className='event-card';
     card.innerHTML=`
       <div class="event-dot" style="background:${ev.color}"></div>
@@ -381,14 +429,14 @@ function renderHomeEvents(){
       </div>
       <div class="event-btns">
         <button class="del-btn" onclick="deleteEvent(${i})">✕</button>
-        <button class="open-gcal-btn" onclick="openGcalOverlay('${ev.title}','${ev.date}','${ev.time}','${ev.location||''}','${ev.memo||''}')">캘린더</button>
+        <button class="open-gcal-btn" onclick="openGcalOverlay('${ev.title.replace(/'/g,"\\'")}','${ev.date}','${ev.time}','${(ev.location||'').replace(/'/g,"\\'")}','${(ev.memo||'').replace(/'/g,"\\'")}')">캘린더</button>
       </div>`;
     list.appendChild(card);
   });
 }
-
 function deleteEvent(i){events.splice(i,1);saveEvents();renderHomeEvents();renderCalendar();}
 
+// ── 메모 파싱 ──
 function parseMemo(){
   const raw=document.getElementById('memo-input').value.trim();
   if(!raw){showToast('메모를 입력해주세요');return;}
@@ -403,7 +451,7 @@ function parseMemo(){
   let t=raw.replace(/내일|오늘|\d+월\s*\d+일|오전|오후|\d+시|\d+분|알림|알려줘|예약|등록/g,'').replace(/\s+/g,' ').trim();
   if(t.length>1)title=t;
   const alerts=getSelectedAlerts('alert-chips');
-  if(alerts.length===0){showToast('알림 시간을 하나 이상 선택해주세요');return;}
+  if(!alerts.length){showToast('알림 시간을 하나 이상 선택해주세요');return;}
   document.getElementById('p-title').textContent=title;
   document.getElementById('p-date').textContent=date;
   document.getElementById('p-time').textContent=time;
@@ -430,17 +478,7 @@ function addEvent(){
   openGcalOverlay(title,date,time,'','');
 }
 
-function openGcalOverlay(title,date,time,location,memo){
-  const urls=buildGCalURLs(title,date,time,location,memo);
-  document.getElementById('overlay-title').textContent=`"${title}" 캘린더 등록`;
-  document.getElementById('gcal-app-btn').href=urls.app;
-  document.getElementById('gcal-web-btn').href=urls.web;
-  document.getElementById('overlay').classList.add('show');
-}
-
-function closeOverlay(){document.getElementById('overlay').classList.remove('show');showToast('일정이 저장됐어요!');}
-document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)closeOverlay();});
-
+// ── 캘린더 모달 ──
 function openModal(){
   const today=new Date();
   document.getElementById('m-title').value='';
@@ -463,11 +501,10 @@ function saveModalEvent(){
   const location=document.getElementById('m-location').value.trim();
   const memo=document.getElementById('m-memo').value.trim();
   const alerts=getSelectedAlerts('modal-chips');
-  if(alerts.length===0){showToast('알림 시간을 선택해주세요');return;}
+  if(!alerts.length){showToast('알림 시간을 선택해주세요');return;}
   const dp=dateVal.split('-');
   const date=`${parseInt(dp[1])}월 ${parseInt(dp[2])}일`;
-  const tp=timeVal.split(':');
-  const h=parseInt(tp[0]);
+  const tp=timeVal.split(':'),h=parseInt(tp[0]);
   const time=h<12?`오전 ${h===0?12:h}:${tp[1]}`:`오후 ${h===12?12:h-12}:${tp[1]}`;
   colorIdx=(colorIdx+1)%COLORS.length;
   const ev={title,date,time,alerts,color:COLORS[colorIdx],location,memo};
@@ -476,7 +513,7 @@ function saveModalEvent(){
   openGcalOverlay(title,date,time,location,memo);
 }
 
-// ── 캘린더 ──
+// ── 캘린더 렌더 ──
 function renderCalendar(){
   document.getElementById('cal-month-label').textContent=`${calYear}년 ${calMonth+1}월`;
   const grid=document.getElementById('cal-grid');grid.innerHTML='';
@@ -488,7 +525,6 @@ function renderCalendar(){
   for(let i=1;i<=rem;i++)addCalDay(grid,new Date(calYear,calMonth+1,i),true);
   renderCalEvents(selectedDate||today);
 }
-
 function addCalDay(grid,date,other){
   const today=new Date();
   const el=document.createElement('div');
@@ -501,14 +537,12 @@ function addCalDay(grid,date,other){
   el.onclick=()=>{selectedDate=new Date(date);renderCalendar();};
   grid.appendChild(el);
 }
-
 function getEventsForDate(date){
   return events.filter(ev=>{
     const dm=ev.date.match(/(\d{1,2})월\s*(\d{1,2})일/);
     return dm&&parseInt(dm[1])===date.getMonth()+1&&parseInt(dm[2])===date.getDate();
   });
 }
-
 function renderCalEvents(date){
   document.getElementById('cal-events-title').textContent=`${date.getMonth()+1}월 ${date.getDate()}일 일정`;
   const list=document.getElementById('cal-events-list');list.innerHTML='';
@@ -527,16 +561,26 @@ function renderCalEvents(date){
           ${(ev.alerts||[]).map(a=>`<span class="tag tag-alert">${a.val}</span>`).join('')}
         </div>
       </div>
-      <button class="open-gcal-btn" onclick="openGcalOverlay('${ev.title}','${ev.date}','${ev.time}','${ev.location||''}','${ev.memo||''}')">열기</button>`;
+      <button class="open-gcal-btn" onclick="openGcalOverlay('${ev.title.replace(/'/g,"\\'")}','${ev.date}','${ev.time}','${(ev.location||'').replace(/'/g,"\\'")}','${(ev.memo||'').replace(/'/g,"\\'")}')">열기</button>`;
     list.appendChild(item);
   });
 }
-
 function changeMonth(dir){
   calMonth+=dir;
   if(calMonth>11){calMonth=0;calYear++;}
   if(calMonth<0){calMonth=11;calYear--;}
   selectedDate=null;renderCalendar();
+}
+
+// ── 3번: 자동 업데이트 감지 ──
+function checkUpdate(){
+  try{
+    const saved=localStorage.getItem('app_version');
+    if(saved&&saved!==APP_VERSION){
+      document.getElementById('update-banner').classList.add('show');
+    }
+    localStorage.setItem('app_version',APP_VERSION);
+  }catch(e){}
 }
 
 setInterval(()=>{
@@ -547,6 +591,7 @@ setInterval(()=>{
 loadEvents();
 events.forEach(ev=>scheduleNotifs(ev));
 renderHomeEvents();
+checkUpdate();
 </script>
 </body>
 </html>
