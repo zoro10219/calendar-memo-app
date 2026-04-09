@@ -11,151 +11,43 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f3f4f6; }
-
-    .app {
-      max-width: 430px;
-      margin: 0 auto;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background: #fff;
-      box-shadow: 0 0 40px rgba(0,0,0,0.1);
-    }
-
-    /* STATUS BAR */
-    .status-bar {
-      background: #4F46E5;
-      color: #fff;
-      font-size: 12px;
-      padding: env(safe-area-inset-top, 10px) 20px 6px;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    /* HEADER */
-    .app-header {
-      background: #4F46E5;
-      padding: 8px 20px 18px;
-      color: #fff;
-    }
+    .app { max-width: 430px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; background: #fff; box-shadow: 0 0 40px rgba(0,0,0,0.1); }
+    .status-bar { background: #4F46E5; color: #fff; font-size: 12px; padding: env(safe-area-inset-top, 10px) 20px 6px; display: flex; justify-content: space-between; }
+    .app-header { background: #4F46E5; padding: 8px 20px 18px; color: #fff; }
     .app-header h1 { font-size: 20px; font-weight: 600; }
     .app-header p { font-size: 12px; opacity: 0.8; margin-top: 2px; }
-    .gcal-badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: rgba(255,255,255,0.2); border-radius: 20px;
-      padding: 4px 10px; font-size: 11px; margin-top: 8px;
-    }
+    .gcal-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 10px; font-size: 11px; margin-top: 8px; }
     .gcal-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; }
-
-    /* BODY */
-    .body-area {
-      flex: 1; overflow-y: auto; padding: 16px;
-      background: #f3f4f6;
-      display: flex; flex-direction: column; gap: 12px;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    /* NOTIFICATION */
-    .notif-card {
-      background: #EEF2FF; border-radius: 14px;
-      border: 1px solid #C7D2FE;
-      padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start;
-    }
+    .body-area { flex: 1; overflow-y: auto; padding: 16px; background: #f3f4f6; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
+    .notif-card { background: #EEF2FF; border-radius: 14px; border: 1px solid #C7D2FE; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; }
     .notif-icon { font-size: 18px; flex-shrink: 0; }
     .notif-text { font-size: 13px; color: #3730A3; }
     .notif-time { font-size: 11px; color: #818CF8; margin-top: 2px; }
-
-    /* INPUT CARD */
-    .memo-input-card {
-      background: #fff; border-radius: 14px;
-      border: 1px solid #e5e7eb; padding: 14px;
-    }
-    .memo-input-card > label {
-      font-size: 12px; color: #6b7280; display: block; margin-bottom: 6px;
-    }
-    textarea {
-      width: 100%; border: 1px solid #d1d5db;
-      border-radius: 10px; padding: 10px;
-      font-size: 15px; resize: none; height: 85px;
-      background: #f9fafb; color: #111827;
-      font-family: inherit; line-height: 1.5;
-    }
+    .memo-input-card { background: #fff; border-radius: 14px; border: 1px solid #e5e7eb; padding: 14px; }
+    .memo-input-card > label { font-size: 12px; color: #6b7280; display: block; margin-bottom: 6px; }
+    textarea { width: 100%; border: 1px solid #d1d5db; border-radius: 10px; padding: 10px; font-size: 15px; resize: none; height: 85px; background: #f9fafb; color: #111827; font-family: inherit; line-height: 1.5; }
     textarea:focus { outline: none; border-color: #4F46E5; }
-
-    /* ALERT CHIPS */
     .alert-section { margin-top: 12px; }
     .alert-section > label { font-size: 12px; color: #6b7280; display: block; margin-bottom: 7px; }
     .alert-chips { display: flex; flex-wrap: wrap; gap: 7px; }
-    .chip {
-      font-size: 13px; padding: 6px 13px;
-      border-radius: 20px; cursor: pointer;
-      border: 1px solid #d1d5db;
-      background: #f9fafb; color: #6b7280;
-      user-select: none; transition: all 0.15s;
-    }
-    .chip.selected {
-      background: #EEF2FF; color: #4338CA;
-      border-color: #A5B4FC; font-weight: 600;
-    }
-
-    /* PARSE BUTTON */
-    .parse-btn {
-      width: 100%; margin-top: 13px;
-      background: #4F46E5; color: #fff;
-      border: none; border-radius: 10px;
-      padding: 12px; font-size: 15px;
-      cursor: pointer; font-weight: 600;
-      transition: background 0.15s;
-    }
+    .chip { font-size: 13px; padding: 6px 13px; border-radius: 20px; cursor: pointer; border: 1px solid #d1d5db; background: #f9fafb; color: #6b7280; user-select: none; transition: all 0.15s; }
+    .chip.selected { background: #EEF2FF; color: #4338CA; border-color: #A5B4FC; font-weight: 600; }
+    .parse-btn { width: 100%; margin-top: 13px; background: #4F46E5; color: #fff; border: none; border-radius: 10px; padding: 12px; font-size: 15px; cursor: pointer; font-weight: 600; }
     .parse-btn:active { background: #4338CA; }
-
-    /* PARSED PREVIEW */
-    .parsed-preview {
-      background: #fff; border-radius: 14px;
-      border: 1px solid #A5B4FC;
-      padding: 14px; display: none;
-    }
+    .parsed-preview { background: #fff; border-radius: 14px; border: 1px solid #A5B4FC; padding: 14px; display: none; }
     .parsed-preview.show { display: block; }
     .parsed-preview h3 { font-size: 13px; color: #4F46E5; font-weight: 600; margin-bottom: 11px; }
     .parsed-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 9px; }
     .parsed-label { min-width: 44px; font-size: 11px; color: #9ca3af; padding-top: 2px; }
-    .parsed-val {
-      color: #111827; flex: 1; font-size: 14px;
-      border-bottom: 1px dashed #d1d5db;
-      outline: none; padding-bottom: 2px;
-    }
+    .parsed-val { color: #111827; flex: 1; font-size: 14px; border-bottom: 1px dashed #d1d5db; outline: none; padding-bottom: 2px; }
     .alert-summary { display: flex; flex-wrap: wrap; gap: 5px; flex: 1; }
-    .alert-tag-preview {
-      font-size: 11px; padding: 3px 9px; border-radius: 20px;
-      background: #EEF2FF; color: #4338CA; font-weight: 500;
-    }
+    .alert-tag-preview { font-size: 11px; padding: 3px 9px; border-radius: 20px; background: #EEF2FF; color: #4338CA; font-weight: 500; }
     .action-row { display: flex; gap: 8px; margin-top: 13px; }
-    .add-btn {
-      flex: 1; background: #4F46E5; color: #fff;
-      border: none; border-radius: 10px;
-      padding: 11px; font-size: 14px; cursor: pointer; font-weight: 600;
-    }
+    .add-btn { flex: 1; background: #4F46E5; color: #fff; border: none; border-radius: 10px; padding: 11px; font-size: 14px; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .add-btn:active { background: #4338CA; }
-    .cancel-btn {
-      background: #f3f4f6; color: #6b7280;
-      border: 1px solid #d1d5db;
-      border-radius: 10px; padding: 11px 16px;
-      font-size: 14px; cursor: pointer;
-    }
-
-    /* SECTION TITLE */
-    .section-title {
-      font-size: 11px; font-weight: 600; color: #9ca3af;
-      text-transform: uppercase; letter-spacing: 0.07em; padding: 0 2px;
-    }
-
-    /* EVENT CARD */
-    .event-card {
-      background: #fff; border-radius: 14px;
-      border: 1px solid #e5e7eb;
-      padding: 13px 14px;
-      display: flex; align-items: flex-start; gap: 12px;
-    }
+    .cancel-btn { background: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db; border-radius: 10px; padding: 11px 16px; font-size: 14px; cursor: pointer; }
+    .section-title { font-size: 11px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.07em; padding: 0 2px; }
+    .event-card { background: #fff; border-radius: 14px; border: 1px solid #e5e7eb; padding: 13px 14px; display: flex; align-items: flex-start; gap: 12px; }
     .event-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
     .event-info { flex: 1; }
     .event-title { font-size: 15px; font-weight: 600; color: #111827; }
@@ -164,38 +56,15 @@
     .tag { font-size: 10px; padding: 3px 8px; border-radius: 20px; font-weight: 500; }
     .tag-gcal { background: #EEF2FF; color: #4338CA; }
     .tag-alert { background: #FEF3C7; color: #92400E; }
-    .tag-done { background: #DCFCE7; color: #166534; }
-    .del-btn {
-      background: none; border: 1px solid #e5e7eb;
-      border-radius: 8px; padding: 5px 9px;
-      font-size: 12px; cursor: pointer; color: #9ca3af;
-    }
+    .event-btns { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; }
+    .del-btn { background: none; border: 1px solid #e5e7eb; border-radius: 8px; padding: 5px 9px; font-size: 12px; cursor: pointer; color: #9ca3af; }
     .del-btn:active { border-color: #EF4444; color: #EF4444; }
-
-    /* BOTTOM NAV */
-    .bottom-nav {
-      background: #fff;
-      border-top: 1px solid #e5e7eb;
-      display: flex;
-      padding: 10px 0 max(16px, env(safe-area-inset-bottom));
-    }
-    .nav-btn {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; gap: 3px;
-      background: none; border: none; cursor: pointer; padding: 4px 0;
-    }
+    .open-gcal-btn { background: #EEF2FF; border: 1px solid #C7D2FE; border-radius: 8px; padding: 5px 9px; font-size: 10px; cursor: pointer; color: #4338CA; white-space: nowrap; }
+    .open-gcal-btn:active { background: #C7D2FE; }
+    .bottom-nav { background: #fff; border-top: 1px solid #e5e7eb; display: flex; padding: 10px 0 max(16px, env(safe-area-inset-bottom)); }
+    .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: none; cursor: pointer; padding: 4px 0; }
     .nav-label { font-size: 10px; color: #9ca3af; }
-
-    /* TOAST */
-    .toast {
-      position: fixed; bottom: 100px; left: 50%;
-      transform: translateX(-50%);
-      background: #1E1B4B; color: #fff;
-      font-size: 13px; padding: 9px 18px;
-      border-radius: 20px; white-space: nowrap;
-      opacity: 0; transition: opacity 0.3s; pointer-events: none;
-      z-index: 999;
-    }
+    .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #1E1B4B; color: #fff; font-size: 13px; padding: 9px 18px; border-radius: 20px; white-space: nowrap; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; }
     .toast.show { opacity: 1; }
   </style>
 </head>
@@ -214,7 +83,6 @@
   </div>
 
   <div class="body-area">
-
     <div class="notif-card">
       <div class="notif-icon">🔔</div>
       <div>
@@ -226,19 +94,17 @@
     <div class="memo-input-card">
       <label>일정 메모 입력</label>
       <textarea id="memo-input" placeholder="예: 내일 오후 2시에 치과 예약&#10;예: 5월 3일 팀 미팅 오전 10시 강남"></textarea>
-
       <div class="alert-section">
         <label>알림 시간 선택 (복수 선택 가능)</label>
         <div class="alert-chips" id="alert-chips">
-          <div class="chip" data-val="1달 전" onclick="toggleChip(this)">1달 전</div>
-          <div class="chip" data-val="1주일 전" onclick="toggleChip(this)">1주일 전</div>
-          <div class="chip" data-val="3일 전" onclick="toggleChip(this)">3일 전</div>
-          <div class="chip" data-val="1일 전" onclick="toggleChip(this)">1일 전</div>
-          <div class="chip selected" data-val="1시간 전" onclick="toggleChip(this)">1시간 전</div>
-          <div class="chip" data-val="10분 전" onclick="toggleChip(this)">10분 전</div>
+          <div class="chip" data-val="1달 전" data-min="43200" onclick="toggleChip(this)">1달 전</div>
+          <div class="chip" data-val="1주일 전" data-min="10080" onclick="toggleChip(this)">1주일 전</div>
+          <div class="chip" data-val="3일 전" data-min="4320" onclick="toggleChip(this)">3일 전</div>
+          <div class="chip" data-val="1일 전" data-min="1440" onclick="toggleChip(this)">1일 전</div>
+          <div class="chip selected" data-val="1시간 전" data-min="60" onclick="toggleChip(this)">1시간 전</div>
+          <div class="chip" data-val="10분 전" data-min="10" onclick="toggleChip(this)">10분 전</div>
         </div>
       </div>
-
       <button class="parse-btn" onclick="parseMemo()">일정 분석하기</button>
     </div>
 
@@ -261,7 +127,10 @@
         <div class="alert-summary" id="p-alert"></div>
       </div>
       <div class="action-row">
-        <button class="add-btn" onclick="addEvent()">Google Calendar에 등록</button>
+        <button class="add-btn" onclick="addEvent()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Google Calendar에 등록
+        </button>
         <button class="cancel-btn" onclick="document.getElementById('parsed-preview').classList.remove('show')">취소</button>
       </div>
     </div>
@@ -280,7 +149,9 @@
             <span class="tag tag-alert">10분 전</span>
           </div>
         </div>
-        <button class="del-btn" onclick="this.closest('.event-card').remove()">✕</button>
+        <div class="event-btns">
+          <button class="del-btn" onclick="this.closest('.event-card').remove()">✕</button>
+        </div>
       </div>
       <div class="event-card">
         <div class="event-dot" style="background:#0891B2"></div>
@@ -293,7 +164,9 @@
             <span class="tag tag-alert">1시간 전</span>
           </div>
         </div>
-        <button class="del-btn" onclick="this.closest('.event-card').remove()">✕</button>
+        <div class="event-btns">
+          <button class="del-btn" onclick="this.closest('.event-card').remove()">✕</button>
+        </div>
       </div>
     </div>
   </div>
@@ -327,14 +200,45 @@
   function toggleChip(el) { el.classList.toggle('selected'); }
 
   function getSelectedAlerts() {
-    return [...document.querySelectorAll('#alert-chips .chip.selected')].map(c => c.dataset.val);
+    return [...document.querySelectorAll('#alert-chips .chip.selected')]
+      .map(c => ({ val: c.dataset.val, min: parseInt(c.dataset.min) }));
   }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2200);
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  function buildGCalURL(title, dateStr, timeStr) {
+    const now = new Date();
+    const year = now.getFullYear();
+    let month = now.getMonth() + 1, day = now.getDate();
+
+    if (/내일/.test(dateStr)) {
+      const t = new Date(now); t.setDate(t.getDate()+1);
+      month = t.getMonth()+1; day = t.getDate();
+    } else {
+      const dm = dateStr.match(/(\d{1,2})월\s*(\d{1,2})일/);
+      if (dm) { month = parseInt(dm[1]); day = parseInt(dm[2]); }
+    }
+
+    let hour = 9, min = 0;
+    const am = timeStr.match(/오전\s*(\d+):(\d+)/);
+    const pm = timeStr.match(/오후\s*(\d+):(\d+)/);
+    if (am) { hour = parseInt(am[1]); min = parseInt(am[2]); }
+    else if (pm) { hour = parseInt(pm[1]) + 12; min = parseInt(pm[2]); if(hour>=24) hour=23; }
+
+    const pad = n => String(n).padStart(2,'0');
+    const start = `${year}${pad(month)}${pad(day)}T${pad(hour)}${pad(min)}00`;
+    const endD = new Date(year, month-1, day, hour+1, min);
+    const end = `${endD.getFullYear()}${pad(endD.getMonth()+1)}${pad(endD.getDate())}T${pad(endD.getHours())}${pad(endD.getMinutes())}00`;
+
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE`
+      + `&text=${encodeURIComponent(title)}`
+      + `&dates=${start}/${end}`
+      + `&details=${encodeURIComponent('일정 메모장 앱에서 등록됨')}`;
   }
 
   function parseMemo() {
@@ -345,23 +249,19 @@
     const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
     const fmt = d => `${d.getMonth()+1}월 ${d.getDate()}일`;
 
-    let title = raw, date = fmt(today), time = '시간 미입력';
+    let title = raw, date = fmt(today), time = '오전 9:00';
 
-    const timeMatch = raw.match(/오전\s*(\d+)시(?:\s*(\d+)분)?|오후\s*(\d+)시(?:\s*(\d+)분)?/);
-    if (timeMatch) {
-      if (timeMatch[1]) time = `오전 ${timeMatch[1]}:${timeMatch[2]||'00'}`;
-      else if (timeMatch[3]) time = `오후 ${timeMatch[3]}:${timeMatch[4]||'00'}`;
+    const tm = raw.match(/오전\s*(\d+)시(?:\s*(\d+)분)?|오후\s*(\d+)시(?:\s*(\d+)분)?/);
+    if (tm) {
+      if (tm[1]) time = `오전 ${tm[1]}:${tm[2]||'00'}`;
+      else if (tm[3]) time = `오후 ${tm[3]}:${tm[4]||'00'}`;
     }
 
     if (/내일/.test(raw)) date = fmt(tomorrow);
     else if (/오늘/.test(raw)) date = fmt(today);
-    else {
-      const dm = raw.match(/(\d{1,2})월\s*(\d{1,2})일/);
-      if (dm) date = `${dm[1]}월 ${dm[2]}일`;
-    }
+    else { const dm = raw.match(/(\d{1,2})월\s*(\d{1,2})일/); if (dm) date = `${dm[1]}월 ${dm[2]}일`; }
 
-    const stopWords = /내일|오늘|\d+월\s*\d+일|오전|오후|\d+시|\d+분|알림|알려줘|예약|등록/g;
-    let t = raw.replace(stopWords,'').replace(/\s+/g,' ').trim();
+    let t = raw.replace(/내일|오늘|\d+월\s*\d+일|오전|오후|\d+시|\d+분|알림|알려줘|예약|등록/g,'').replace(/\s+/g,' ').trim();
     if (t.length > 1) title = t;
 
     const alerts = getSelectedAlerts();
@@ -371,7 +271,7 @@
     document.getElementById('p-date').textContent = date;
     document.getElementById('p-time').textContent = time;
     document.getElementById('p-alert').innerHTML = alerts.map(a =>
-      `<span class="alert-tag-preview">${a}</span>`).join('');
+      `<span class="alert-tag-preview">${a.val}</span>`).join('');
     document.getElementById('parsed-preview').classList.add('show');
   }
 
@@ -379,9 +279,16 @@
     const title = document.getElementById('p-title').textContent.trim();
     const date  = document.getElementById('p-date').textContent.trim();
     const time  = document.getElementById('p-time').textContent.trim();
-    const alerts = [...document.querySelectorAll('#p-alert .alert-tag-preview')].map(el => el.textContent);
+    const alertEls = [...document.querySelectorAll('#p-alert .alert-tag-preview')];
+    const alertLabels = alertEls.map(el => el.textContent);
 
+    // 구글 캘린더 새 탭으로 열기
+    const gcalURL = buildGCalURL(title, date, time);
+    window.open(gcalURL, '_blank');
+
+    // 카드 추가
     colorIdx = (colorIdx + 1) % COLORS.length;
+    const savedURL = gcalURL;
     const card = document.createElement('div');
     card.className = 'event-card';
     card.innerHTML = `
@@ -391,19 +298,23 @@
         <div class="event-time">${date} · ${time}</div>
         <div class="event-tags">
           <span class="tag tag-gcal">구글 캘린더</span>
-          ${alerts.map(a=>`<span class="tag tag-alert">${a}</span>`).join('')}
+          ${alertLabels.map(a=>`<span class="tag tag-alert">${a}</span>`).join('')}
         </div>
       </div>
-      <button class="del-btn" onclick="this.closest('.event-card').remove()">✕</button>
+      <div class="event-btns">
+        <button class="del-btn" onclick="this.closest('.event-card').remove()">✕</button>
+        <button class="open-gcal-btn" onclick="window.open('${savedURL}','_blank')">캘린더 열기</button>
+      </div>
     `;
     document.getElementById('events-list').insertBefore(card, document.getElementById('events-list').firstChild);
     document.getElementById('parsed-preview').classList.remove('show');
     document.getElementById('memo-input').value = '';
     document.querySelectorAll('#alert-chips .chip').forEach(c => c.classList.remove('selected'));
+
     const lbl = document.getElementById('gcal-label');
-    lbl.textContent = '캘린더 등록 완료!';
-    setTimeout(() => lbl.textContent = 'Google Calendar 연동됨', 2500);
-    showToast('일정이 등록되었어요');
+    lbl.textContent = '캘린더 페이지 열림!';
+    setTimeout(() => lbl.textContent = 'Google Calendar 연동됨', 3000);
+    showToast('구글 캘린더가 열렸어요 — 저장 버튼을 눌러주세요!');
   }
 
   setInterval(() => {
