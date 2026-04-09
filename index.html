@@ -1,71 +1,150 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#4F46E5" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="일정 메모장" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="theme-color" content="#4F46E5"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="일정 메모장"/>
   <title>일정 메모장</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f3f4f6; }
-    .app { max-width: 430px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; background: #fff; box-shadow: 0 0 40px rgba(0,0,0,0.1); }
-    .status-bar { background: #4F46E5; color: #fff; font-size: 12px; padding: env(safe-area-inset-top, 10px) 20px 6px; display: flex; justify-content: space-between; }
-    .app-header { background: #4F46E5; padding: 8px 20px 18px; color: #fff; }
-    .app-header h1 { font-size: 20px; font-weight: 600; }
-    .app-header p { font-size: 12px; opacity: 0.8; margin-top: 2px; }
-    .gcal-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 10px; font-size: 11px; margin-top: 8px; }
-    .gcal-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; }
-    .body-area { flex: 1; overflow-y: auto; padding: 16px; background: #f3f4f6; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
-    .notif-card { background: #EEF2FF; border-radius: 14px; border: 1px solid #C7D2FE; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; }
-    .notif-icon { font-size: 18px; flex-shrink: 0; }
-    .notif-text { font-size: 13px; color: #3730A3; }
-    .notif-time { font-size: 11px; color: #818CF8; margin-top: 2px; }
-    .memo-input-card { background: #fff; border-radius: 14px; border: 1px solid #e5e7eb; padding: 14px; }
-    .memo-input-card > label { font-size: 12px; color: #6b7280; display: block; margin-bottom: 6px; }
-    textarea { width: 100%; border: 1px solid #d1d5db; border-radius: 10px; padding: 10px; font-size: 15px; resize: none; height: 85px; background: #f9fafb; color: #111827; font-family: inherit; line-height: 1.5; }
-    textarea:focus { outline: none; border-color: #4F46E5; }
-    .alert-section { margin-top: 12px; }
-    .alert-section > label { font-size: 12px; color: #6b7280; display: block; margin-bottom: 7px; }
-    .alert-chips { display: flex; flex-wrap: wrap; gap: 7px; }
-    .chip { font-size: 13px; padding: 6px 13px; border-radius: 20px; cursor: pointer; border: 1px solid #d1d5db; background: #f9fafb; color: #6b7280; user-select: none; transition: all 0.15s; }
-    .chip.selected { background: #EEF2FF; color: #4338CA; border-color: #A5B4FC; font-weight: 600; }
-    .parse-btn { width: 100%; margin-top: 13px; background: #4F46E5; color: #fff; border: none; border-radius: 10px; padding: 12px; font-size: 15px; cursor: pointer; font-weight: 600; }
-    .parse-btn:active { background: #4338CA; }
-    .parsed-preview { background: #fff; border-radius: 14px; border: 1px solid #A5B4FC; padding: 14px; display: none; }
-    .parsed-preview.show { display: block; }
-    .parsed-preview h3 { font-size: 13px; color: #4F46E5; font-weight: 600; margin-bottom: 11px; }
-    .parsed-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 9px; }
-    .parsed-label { min-width: 44px; font-size: 11px; color: #9ca3af; padding-top: 2px; }
-    .parsed-val { color: #111827; flex: 1; font-size: 14px; border-bottom: 1px dashed #d1d5db; outline: none; padding-bottom: 2px; }
-    .alert-summary { display: flex; flex-wrap: wrap; gap: 5px; flex: 1; }
-    .alert-tag-preview { font-size: 11px; padding: 3px 9px; border-radius: 20px; background: #EEF2FF; color: #4338CA; font-weight: 500; }
-    .action-row { display: flex; gap: 8px; margin-top: 13px; }
-    .add-btn { flex: 1; background: #4F46E5; color: #fff; border: none; border-radius: 10px; padding: 11px; font-size: 14px; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .add-btn:active { background: #4338CA; }
-    .cancel-btn { background: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db; border-radius: 10px; padding: 11px 16px; font-size: 14px; cursor: pointer; }
-    .section-title { font-size: 11px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.07em; padding: 0 2px; }
-    .event-card { background: #fff; border-radius: 14px; border: 1px solid #e5e7eb; padding: 13px 14px; display: flex; align-items: flex-start; gap: 12px; }
-    .event-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
-    .event-info { flex: 1; }
-    .event-title { font-size: 15px; font-weight: 600; color: #111827; }
-    .event-time { font-size: 12px; color: #6b7280; margin-top: 2px; }
-    .event-tags { display: flex; gap: 5px; margin-top: 7px; flex-wrap: wrap; }
-    .tag { font-size: 10px; padding: 3px 8px; border-radius: 20px; font-weight: 500; }
-    .tag-gcal { background: #EEF2FF; color: #4338CA; }
-    .tag-alert { background: #FEF3C7; color: #92400E; }
-    .event-btns { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; }
-    .del-btn { background: none; border: 1px solid #e5e7eb; border-radius: 8px; padding: 5px 9px; font-size: 12px; cursor: pointer; color: #9ca3af; }
-    .del-btn:active { border-color: #EF4444; color: #EF4444; }
-    .open-gcal-btn { background: #EEF2FF; border: 1px solid #C7D2FE; border-radius: 8px; padding: 5px 9px; font-size: 10px; cursor: pointer; color: #4338CA; white-space: nowrap; }
-    .open-gcal-btn:active { background: #C7D2FE; }
-    .bottom-nav { background: #fff; border-top: 1px solid #e5e7eb; display: flex; padding: 10px 0 max(16px, env(safe-area-inset-bottom)); }
-    .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: none; cursor: pointer; padding: 4px 0; }
-    .nav-label { font-size: 10px; color: #9ca3af; }
-    .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #1E1B4B; color: #fff; font-size: 13px; padding: 9px 18px; border-radius: 20px; white-space: nowrap; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; }
-    .toast.show { opacity: 1; }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f3f4f6;overflow:hidden;}
+
+    /* ── 앱 레이아웃 ── */
+    .app{max-width:430px;margin:0 auto;height:100vh;display:flex;flex-direction:column;background:#fff;position:relative;overflow:hidden;}
+    .status-bar{background:#4F46E5;color:#fff;font-size:12px;padding:env(safe-area-inset-top,10px) 20px 6px;display:flex;justify-content:space-between;flex-shrink:0;}
+    .app-header{background:#4F46E5;padding:8px 20px 18px;color:#fff;flex-shrink:0;}
+    .app-header h1{font-size:20px;font-weight:600;}
+    .app-header p{font-size:12px;opacity:.8;margin-top:2px;}
+    .gcal-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);border-radius:20px;padding:4px 10px;font-size:11px;margin-top:8px;}
+    .gcal-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;}
+
+    /* ── 화면 전환 ── */
+    .screen{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;flex-direction:column;}
+    .screen.active{display:flex;}
+
+    /* ── 홈 화면 ── */
+    .body-area{padding:16px;display:flex;flex-direction:column;gap:12px;padding-bottom:80px;}
+
+    /* ── 알림 카드 ── */
+    .notif-card{background:#EEF2FF;border-radius:14px;border:1px solid #C7D2FE;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;flex-shrink:0;}
+    .notif-icon{font-size:18px;flex-shrink:0;}
+    .notif-text{font-size:13px;color:#3730A3;}
+    .notif-time{font-size:11px;color:#818CF8;margin-top:2px;}
+
+    /* ── 입력 카드 ── */
+    .memo-input-card{background:#fff;border-radius:14px;border:1px solid #e5e7eb;padding:14px;}
+    .memo-input-card>label{font-size:12px;color:#6b7280;display:block;margin-bottom:6px;}
+    textarea{width:100%;border:1px solid #d1d5db;border-radius:10px;padding:10px;font-size:15px;resize:none;height:85px;background:#f9fafb;color:#111827;font-family:inherit;line-height:1.5;}
+    textarea:focus{outline:none;border-color:#4F46E5;}
+    .alert-section{margin-top:12px;}
+    .alert-section>label{font-size:12px;color:#6b7280;display:block;margin-bottom:7px;}
+    .alert-chips{display:flex;flex-wrap:wrap;gap:7px;}
+    .chip{font-size:13px;padding:6px 13px;border-radius:20px;cursor:pointer;border:1px solid #d1d5db;background:#f9fafb;color:#6b7280;user-select:none;transition:all .15s;}
+    .chip.selected{background:#EEF2FF;color:#4338CA;border-color:#A5B4FC;font-weight:600;}
+    .parse-btn{width:100%;margin-top:13px;background:#4F46E5;color:#fff;border:none;border-radius:10px;padding:12px;font-size:15px;cursor:pointer;font-weight:600;}
+    .parse-btn:active{background:#4338CA;}
+
+    /* ── 분석 미리보기 ── */
+    .parsed-preview{background:#fff;border-radius:14px;border:1px solid #A5B4FC;padding:14px;display:none;}
+    .parsed-preview.show{display:block;}
+    .parsed-preview h3{font-size:13px;color:#4F46E5;font-weight:600;margin-bottom:11px;}
+    .parsed-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:9px;}
+    .parsed-label{min-width:44px;font-size:11px;color:#9ca3af;padding-top:2px;}
+    .parsed-val{color:#111827;flex:1;font-size:14px;border-bottom:1px dashed #d1d5db;outline:none;padding-bottom:2px;}
+    .alert-summary{display:flex;flex-wrap:wrap;gap:5px;flex:1;}
+    .alert-tag-preview{font-size:11px;padding:3px 9px;border-radius:20px;background:#EEF2FF;color:#4338CA;font-weight:500;}
+    .action-row{display:flex;gap:8px;margin-top:13px;}
+    .add-btn{flex:1;background:#4F46E5;color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;cursor:pointer;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;}
+    .add-btn:active{background:#4338CA;}
+    .cancel-btn{background:#f3f4f6;color:#6b7280;border:1px solid #d1d5db;border-radius:10px;padding:11px 16px;font-size:14px;cursor:pointer;}
+
+    /* ── 일정 목록 ── */
+    .section-title{font-size:11px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em;padding:0 2px;}
+    .event-card{background:#fff;border-radius:14px;border:1px solid #e5e7eb;padding:13px 14px;display:flex;align-items:flex-start;gap:12px;}
+    .event-dot{width:10px;height:10px;border-radius:50%;margin-top:4px;flex-shrink:0;}
+    .event-info{flex:1;}
+    .event-title{font-size:15px;font-weight:600;color:#111827;}
+    .event-time{font-size:12px;color:#6b7280;margin-top:2px;}
+    .event-tags{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap;}
+    .tag{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:500;}
+    .tag-gcal{background:#EEF2FF;color:#4338CA;}
+    .tag-alert{background:#FEF3C7;color:#92400E;}
+    .event-btns{display:flex;flex-direction:column;gap:5px;align-items:flex-end;}
+    .del-btn{background:none;border:1px solid #e5e7eb;border-radius:8px;padding:5px 9px;font-size:12px;cursor:pointer;color:#9ca3af;}
+    .del-btn:active{border-color:#EF4444;color:#EF4444;}
+    .open-gcal-btn{background:#EEF2FF;border:1px solid #C7D2FE;border-radius:8px;padding:5px 9px;font-size:10px;color:#4338CA;white-space:nowrap;text-decoration:none;display:inline-block;}
+
+    /* ── 하단 네비 ── */
+    .bottom-nav{background:#fff;border-top:1px solid #e5e7eb;display:flex;padding:10px 0 max(16px,env(safe-area-inset-bottom));flex-shrink:0;}
+    .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:4px 0;}
+    .nav-label{font-size:10px;color:#9ca3af;}
+    .nav-btn.active .nav-label{color:#4F46E5;}
+
+    /* ── 캘린더 화면 ── */
+    .cal-screen{padding:16px;display:flex;flex-direction:column;gap:14px;padding-bottom:80px;}
+    .cal-header{display:flex;align-items:center;justify-content:space-between;}
+    .cal-month{font-size:17px;font-weight:600;color:#111827;}
+    .cal-nav-btn{background:none;border:1px solid #e5e7eb;border-radius:8px;padding:5px 12px;font-size:14px;cursor:pointer;color:#6b7280;}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+    .cal-day-label{text-align:center;font-size:11px;color:#9ca3af;padding:4px 0;font-weight:500;}
+    .cal-day{min-height:38px;border-radius:8px;display:flex;flex-direction:column;align-items:center;padding:4px 2px;cursor:pointer;position:relative;}
+    .cal-day:hover{background:#f3f4f6;}
+    .cal-day.today .cal-day-num{background:#4F46E5;color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;}
+    .cal-day.selected{background:#EEF2FF;}
+    .cal-day-num{font-size:13px;color:#111827;width:26px;height:26px;display:flex;align-items:center;justify-content:center;}
+    .cal-day.other-month .cal-day-num{color:#d1d5db;}
+    .cal-dot-row{display:flex;gap:2px;margin-top:1px;}
+    .cal-dot{width:5px;height:5px;border-radius:50%;background:#4F46E5;}
+    .cal-events-title{font-size:13px;font-weight:600;color:#6b7280;margin-top:4px;}
+    .cal-event-item{background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;}
+    .cal-event-dot{width:9px;height:9px;border-radius:50%;margin-top:3px;flex-shrink:0;}
+    .cal-event-info{flex:1;}
+    .cal-event-title{font-size:14px;font-weight:600;color:#111827;}
+    .cal-event-time{font-size:12px;color:#6b7280;margin-top:1px;}
+    .cal-event-tags{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap;}
+    .no-events{text-align:center;color:#9ca3af;font-size:13px;padding:20px 0;}
+
+    /* ── 일정 추가 모달 ── */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end;justify-content:center;}
+    .modal-overlay.show{display:flex;}
+    .modal-card{background:#fff;border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:430px;max-height:85vh;overflow-y:auto;}
+    .modal-title{font-size:16px;font-weight:600;color:#111827;margin-bottom:16px;}
+    .form-group{margin-bottom:14px;}
+    .form-label{font-size:12px;color:#6b7280;display:block;margin-bottom:6px;}
+    .form-input{width:100%;border:1px solid #d1d5db;border-radius:10px;padding:10px 12px;font-size:14px;background:#f9fafb;color:#111827;font-family:inherit;}
+    .form-input:focus{outline:none;border-color:#4F46E5;}
+    .form-textarea{width:100%;border:1px solid #d1d5db;border-radius:10px;padding:10px 12px;font-size:14px;background:#f9fafb;color:#111827;font-family:inherit;resize:none;height:70px;line-height:1.5;}
+    .form-textarea:focus{outline:none;border-color:#4F46E5;}
+    .modal-btns{display:flex;gap:8px;margin-top:16px;}
+    .modal-save-btn{flex:1;background:#4F46E5;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;}
+    .modal-save-btn:active{background:#4338CA;}
+    .modal-cancel-btn{background:#f3f4f6;color:#6b7280;border:1px solid #d1d5db;border-radius:10px;padding:12px 16px;font-size:14px;cursor:pointer;}
+    .fab{position:fixed;bottom:80px;right:calc(50% - 215px + 16px);width:52px;height:52px;border-radius:50%;background:#4F46E5;color:#fff;border:none;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(79,70,229,.4);z-index:10;}
+
+    /* ── 구글 캘린더 오버레이 ── */
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:flex-end;justify-content:center;}
+    .overlay.show{display:flex;}
+    .overlay-card{background:#fff;border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:430px;}
+    .overlay-title{font-size:15px;font-weight:600;color:#111827;margin-bottom:6px;}
+    .overlay-sub{font-size:13px;color:#6b7280;margin-bottom:16px;line-height:1.6;}
+    .overlay-gcal-btn{display:block;width:100%;background:#4F46E5;color:#fff;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:600;text-align:center;text-decoration:none;margin-bottom:10px;}
+    .overlay-gcal-btn:active{background:#4338CA;}
+    .overlay-cancel{display:block;width:100%;background:#f3f4f6;color:#6b7280;border:none;border-radius:10px;padding:13px;font-size:14px;cursor:pointer;text-align:center;}
+
+    /* ── 인앱 팝업 알림 ── */
+    .popup-notif{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1E1B4B;color:#fff;border-radius:14px;padding:12px 16px;min-width:280px;max-width:360px;z-index:300;opacity:0;transition:opacity .3s,top .3s;pointer-events:none;display:flex;gap:10px;align-items:flex-start;}
+    .popup-notif.show{opacity:1;top:30px;pointer-events:auto;}
+    .popup-notif-icon{font-size:18px;flex-shrink:0;}
+    .popup-notif-body{}
+    .popup-notif-title{font-size:13px;font-weight:600;}
+    .popup-notif-sub{font-size:11px;opacity:.8;margin-top:2px;}
+
+    /* ── 토스트 ── */
+    .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#1E1B4B;color:#fff;font-size:13px;padding:9px 18px;border-radius:20px;white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
+    .toast.show{opacity:1;}
   </style>
 </head>
 <body>
@@ -74,254 +153,499 @@
     <span id="clock">9:41</span><span>●●●</span>
   </div>
   <div class="app-header">
-    <h1>일정 메모장</h1>
-    <p>메모만 써도 캘린더에 등록돼요</p>
+    <h1 id="header-title">일정 메모장</h1>
+    <p id="header-sub">메모만 써도 캘린더에 등록돼요</p>
     <div class="gcal-badge">
       <div class="gcal-dot"></div>
       <span id="gcal-label">Google Calendar 연동됨</span>
     </div>
   </div>
 
-  <div class="body-area">
-    <div class="notif-card">
-      <div class="notif-icon">🔔</div>
-      <div>
-        <div class="notif-text">오늘 오후 3시 — 팀 회의</div>
-        <div class="notif-time">30분 전 알림 예정 · 2시 30분</div>
-      </div>
-    </div>
+  <!-- ── 홈 화면 ── -->
+  <div class="screen active" id="screen-home">
+    <div class="body-area">
+      <div id="notif-area"></div>
 
-    <div class="memo-input-card">
-      <label>일정 메모 입력</label>
-      <textarea id="memo-input" placeholder="예: 내일 오후 2시에 치과 예약&#10;예: 5월 3일 팀 미팅 오전 10시 강남"></textarea>
-      <div class="alert-section">
-        <label>알림 시간 선택 (복수 선택 가능)</label>
-        <div class="alert-chips" id="alert-chips">
-          <div class="chip" data-val="1달 전" data-min="43200" onclick="toggleChip(this)">1달 전</div>
-          <div class="chip" data-val="1주일 전" data-min="10080" onclick="toggleChip(this)">1주일 전</div>
-          <div class="chip" data-val="3일 전" data-min="4320" onclick="toggleChip(this)">3일 전</div>
-          <div class="chip" data-val="1일 전" data-min="1440" onclick="toggleChip(this)">1일 전</div>
-          <div class="chip selected" data-val="1시간 전" data-min="60" onclick="toggleChip(this)">1시간 전</div>
-          <div class="chip" data-val="10분 전" data-min="10" onclick="toggleChip(this)">10분 전</div>
-        </div>
-      </div>
-      <button class="parse-btn" onclick="parseMemo()">일정 분석하기</button>
-    </div>
-
-    <div class="parsed-preview" id="parsed-preview">
-      <h3>분석된 일정 — 수정 후 등록하세요</h3>
-      <div class="parsed-row">
-        <div class="parsed-label">제목</div>
-        <div class="parsed-val" id="p-title" contenteditable="true"></div>
-      </div>
-      <div class="parsed-row">
-        <div class="parsed-label">날짜</div>
-        <div class="parsed-val" id="p-date" contenteditable="true"></div>
-      </div>
-      <div class="parsed-row">
-        <div class="parsed-label">시간</div>
-        <div class="parsed-val" id="p-time" contenteditable="true"></div>
-      </div>
-      <div class="parsed-row">
-        <div class="parsed-label">알림</div>
-        <div class="alert-summary" id="p-alert"></div>
-      </div>
-      <div class="action-row">
-        <button class="add-btn" onclick="addEvent()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-          Google Calendar에 등록
-        </button>
-        <button class="cancel-btn" onclick="document.getElementById('parsed-preview').classList.remove('show')">취소</button>
-      </div>
-    </div>
-
-    <div class="section-title">등록된 일정</div>
-
-    <div id="events-list">
-      <div class="event-card">
-        <div class="event-dot" style="background:#4F46E5"></div>
-        <div class="event-info">
-          <div class="event-title">팀 회의</div>
-          <div class="event-time">오늘 · 오후 3:00</div>
-          <div class="event-tags">
-            <span class="tag tag-gcal">구글 캘린더</span>
-            <span class="tag tag-alert">1시간 전</span>
-            <span class="tag tag-alert">10분 전</span>
+      <div class="memo-input-card">
+        <label>일정 메모 입력</label>
+        <textarea id="memo-input" placeholder="예: 내일 오후 2시에 치과 예약&#10;예: 5월 3일 팀 미팅 오전 10시 강남"></textarea>
+        <div class="alert-section">
+          <label>알림 시간 선택 (복수 선택 가능)</label>
+          <div class="alert-chips" id="alert-chips">
+            <div class="chip" data-val="1달 전" data-min="43200" onclick="toggleChip(this)">1달 전</div>
+            <div class="chip" data-val="1주일 전" data-min="10080" onclick="toggleChip(this)">1주일 전</div>
+            <div class="chip" data-val="3일 전" data-min="4320" onclick="toggleChip(this)">3일 전</div>
+            <div class="chip" data-val="1일 전" data-min="1440" onclick="toggleChip(this)">1일 전</div>
+            <div class="chip selected" data-val="1시간 전" data-min="60" onclick="toggleChip(this)">1시간 전</div>
+            <div class="chip" data-val="10분 전" data-min="10" onclick="toggleChip(this)">10분 전</div>
           </div>
         </div>
-        <div class="event-btns">
-          <button class="del-btn" onclick="this.closest('.event-card').remove()">✕</button>
+        <button class="parse-btn" onclick="parseMemo()">일정 분석하기</button>
+      </div>
+
+      <div class="parsed-preview" id="parsed-preview">
+        <h3>분석된 일정 — 수정 후 등록하세요</h3>
+        <div class="parsed-row"><div class="parsed-label">제목</div><div class="parsed-val" id="p-title" contenteditable="true"></div></div>
+        <div class="parsed-row"><div class="parsed-label">날짜</div><div class="parsed-val" id="p-date" contenteditable="true"></div></div>
+        <div class="parsed-row"><div class="parsed-label">시간</div><div class="parsed-val" id="p-time" contenteditable="true"></div></div>
+        <div class="parsed-row"><div class="parsed-label">알림</div><div class="alert-summary" id="p-alert"></div></div>
+        <div class="action-row">
+          <button class="add-btn" onclick="addEvent()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            Google Calendar에 등록
+          </button>
+          <button class="cancel-btn" onclick="document.getElementById('parsed-preview').classList.remove('show')">취소</button>
         </div>
       </div>
-      <div class="event-card">
-        <div class="event-dot" style="background:#0891B2"></div>
-        <div class="event-info">
-          <div class="event-title">치과 예약</div>
-          <div class="event-time">내일 · 오후 2:00</div>
-          <div class="event-tags">
-            <span class="tag tag-gcal">구글 캘린더</span>
-            <span class="tag tag-alert">1일 전</span>
-            <span class="tag tag-alert">1시간 전</span>
-          </div>
-        </div>
-        <div class="event-btns">
-          <button class="del-btn" onclick="this.closest('.event-card').remove()">✕</button>
-        </div>
-      </div>
+
+      <div class="section-title">등록된 일정</div>
+      <div id="events-list"></div>
     </div>
   </div>
 
+  <!-- ── 캘린더 화면 ── -->
+  <div class="screen" id="screen-cal">
+    <div class="cal-screen">
+      <div class="cal-header">
+        <button class="cal-nav-btn" onclick="changeMonth(-1)">◀</button>
+        <div class="cal-month" id="cal-month-label"></div>
+        <button class="cal-nav-btn" onclick="changeMonth(1)">▶</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="cal-events-title" id="cal-events-title">일정</div>
+      <div id="cal-events-list"></div>
+    </div>
+    <!-- FAB 버튼 -->
+    <button class="fab" onclick="openModal()">+</button>
+  </div>
+
+  <!-- ── 하단 네비 ── -->
   <div class="bottom-nav">
-    <button class="nav-btn">
+    <button class="nav-btn active" id="nav-home" onclick="switchTab('home')">
       <svg width="22" height="22" fill="none" stroke="#4F46E5" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-      <span class="nav-label" style="color:#4F46E5">홈</span>
+      <span class="nav-label">홈</span>
     </button>
-    <button class="nav-btn">
-      <svg width="22" height="22" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+    <button class="nav-btn" id="nav-cal" onclick="switchTab('cal')">
+      <svg width="22" height="22" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24" id="cal-icon"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
       <span class="nav-label">캘린더</span>
     </button>
-    <button class="nav-btn">
+    <button class="nav-btn" id="nav-notif" onclick="switchTab('home')">
       <svg width="22" height="22" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
       <span class="nav-label">알림</span>
     </button>
-    <button class="nav-btn">
+    <button class="nav-btn" id="nav-set" onclick="switchTab('home')">
       <svg width="22" height="22" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
       <span class="nav-label">설정</span>
     </button>
   </div>
 </div>
 
+<!-- ── 구글 캘린더 오버레이 ── -->
+<div class="overlay" id="overlay">
+  <div class="overlay-card">
+    <div class="overlay-title" id="overlay-title">일정 등록 준비 완료!</div>
+    <div class="overlay-sub">아래 버튼을 탭하면 구글 캘린더가 열리고<br>제목·날짜·시간이 자동으로 채워져 있어요.<br>구글 캘린더에서 <b>저장</b>만 누르면 등록 완료!</div>
+    <a id="gcal-link" class="overlay-gcal-btn" href="#" target="_blank" rel="noopener">구글 캘린더에서 저장하기 →</a>
+    <button class="overlay-cancel" onclick="closeOverlay()">닫기</button>
+  </div>
+</div>
+
+<!-- ── 일정 추가 모달 ── -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-title">새 일정 추가</div>
+    <div class="form-group">
+      <label class="form-label">제목</label>
+      <input class="form-input" id="m-title" type="text" placeholder="일정 제목"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">날짜</label>
+      <input class="form-input" id="m-date" type="date"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">시간</label>
+      <input class="form-input" id="m-time" type="time"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">장소</label>
+      <input class="form-input" id="m-location" type="text" placeholder="장소 (선택)"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">내용</label>
+      <textarea class="form-textarea" id="m-memo" placeholder="메모 (선택)"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">알림 시간 (복수 선택)</label>
+      <div class="alert-chips" id="modal-chips">
+        <div class="chip" data-val="1달 전" data-min="43200" onclick="toggleChip(this)">1달 전</div>
+        <div class="chip" data-val="1주일 전" data-min="10080" onclick="toggleChip(this)">1주일 전</div>
+        <div class="chip" data-val="3일 전" data-min="4320" onclick="toggleChip(this)">3일 전</div>
+        <div class="chip" data-val="1일 전" data-min="1440" onclick="toggleChip(this)">1일 전</div>
+        <div class="chip selected" data-val="1시간 전" data-min="60" onclick="toggleChip(this)">1시간 전</div>
+        <div class="chip" data-val="10분 전" data-min="10" onclick="toggleChip(this)">10분 전</div>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-save-btn" onclick="saveModalEvent()">저장 및 구글 캘린더 등록</button>
+      <button class="modal-cancel-btn" onclick="closeModal()">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 인앱 팝업 알림 ── -->
+<div class="popup-notif" id="popup-notif">
+  <div class="popup-notif-icon">🔔</div>
+  <div class="popup-notif-body">
+    <div class="popup-notif-title" id="popup-notif-title"></div>
+    <div class="popup-notif-sub" id="popup-notif-sub"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-  const COLORS = ['#4F46E5','#0891B2','#16A34A','#D97706','#7C3AED','#DC2626'];
-  let colorIdx = 1;
+const COLORS=['#4F46E5','#0891B2','#16A34A','#D97706','#7C3AED','#DC2626'];
+let colorIdx=0;
+let events=[];
+let calYear=new Date().getFullYear();
+let calMonth=new Date().getMonth();
+let selectedDate=null;
+let pendingEvent=null;
+let notifTimers=[];
 
-  function toggleChip(el) { el.classList.toggle('selected'); }
+// ── localStorage ──
+function saveEvents(){localStorage.setItem('memo_events',JSON.stringify(events));}
+function loadEvents(){
+  try{const d=localStorage.getItem('memo_events');if(d)events=JSON.parse(d);}catch(e){events=[];}
+}
 
-  function getSelectedAlerts() {
-    return [...document.querySelectorAll('#alert-chips .chip.selected')]
-      .map(c => ({ val: c.dataset.val, min: parseInt(c.dataset.min) }));
+// ── 탭 전환 ──
+function switchTab(tab){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  if(tab==='home'){
+    document.getElementById('screen-home').classList.add('active');
+    document.getElementById('nav-home').classList.add('active');
+    document.getElementById('header-title').textContent='일정 메모장';
+    document.getElementById('header-sub').textContent='메모만 써도 캘린더에 등록돼요';
+    document.querySelector('#nav-home svg').setAttribute('stroke','#4F46E5');
+    document.querySelector('#cal-icon').setAttribute('stroke','#9ca3af');
+    renderHomeEvents();
+  } else {
+    document.getElementById('screen-cal').classList.add('active');
+    document.getElementById('nav-cal').classList.add('active');
+    document.getElementById('header-title').textContent='캘린더';
+    document.getElementById('header-sub').textContent='일정을 날짜별로 확인하세요';
+    document.querySelector('#nav-home svg').setAttribute('stroke','#9ca3af');
+    document.querySelector('#cal-icon').setAttribute('stroke','#4F46E5');
+    renderCalendar();
   }
+}
 
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2800);
-  }
+// ── 칩 토글 ──
+function toggleChip(el){el.classList.toggle('selected');}
+function getSelectedAlerts(containerId){
+  return[...document.querySelectorAll(`#${containerId} .chip.selected`)].map(c=>({val:c.dataset.val,min:parseInt(c.dataset.min)}));
+}
 
-  function buildGCalURL(title, dateStr, timeStr) {
-    const now = new Date();
-    const year = now.getFullYear();
-    let month = now.getMonth() + 1, day = now.getDate();
+// ── 토스트 ──
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
 
-    if (/내일/.test(dateStr)) {
-      const t = new Date(now); t.setDate(t.getDate()+1);
-      month = t.getMonth()+1; day = t.getDate();
-    } else {
-      const dm = dateStr.match(/(\d{1,2})월\s*(\d{1,2})일/);
-      if (dm) { month = parseInt(dm[1]); day = parseInt(dm[2]); }
+// ── 인앱 팝업 알림 ──
+function showPopupNotif(title,sub){
+  const el=document.getElementById('popup-notif');
+  document.getElementById('popup-notif-title').textContent=title;
+  document.getElementById('popup-notif-sub').textContent=sub;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),4000);
+}
+
+// ── 알림 스케줄 등록 ──
+function scheduleNotifs(ev){
+  if(!ev.alerts)return;
+  ev.alerts.forEach(a=>{
+    const evDate=parseEventDate(ev.date,ev.time);
+    if(!evDate)return;
+    const notifTime=new Date(evDate.getTime()-a.min*60*1000);
+    const delay=notifTime.getTime()-Date.now();
+    if(delay>0&&delay<7*24*60*60*1000){
+      const tid=setTimeout(()=>{
+        showPopupNotif(`🔔 ${ev.title}`,`${a.val} 알림입니다!`);
+      },delay);
+      notifTimers.push(tid);
     }
+  });
+}
 
-    let hour = 9, min = 0;
-    const am = timeStr.match(/오전\s*(\d+):(\d+)/);
-    const pm = timeStr.match(/오후\s*(\d+):(\d+)/);
-    if (am) { hour = parseInt(am[1]); min = parseInt(am[2]); }
-    else if (pm) { hour = parseInt(pm[1]) + 12; min = parseInt(pm[2]); if(hour>=24) hour=23; }
+function parseEventDate(dateStr,timeStr){
+  try{
+    const now=new Date();
+    let year=now.getFullYear(),month=now.getMonth()+1,day=now.getDate();
+    if(/내일/.test(dateStr)){const t=new Date(now);t.setDate(t.getDate()+1);month=t.getMonth()+1;day=t.getDate();}
+    else{const dm=dateStr.match(/(\d{1,2})월\s*(\d{1,2})일/);if(dm){month=parseInt(dm[1]);day=parseInt(dm[2]);}}
+    let hour=9,min=0;
+    const am=timeStr.match(/오전\s*(\d+):(\d+)/);const pm=timeStr.match(/오후\s*(\d+):(\d+)/);
+    if(am){hour=parseInt(am[1]);min=parseInt(am[2]);}
+    else if(pm){hour=parseInt(pm[1])+12;min=parseInt(pm[2]);if(hour>=24)hour=23;}
+    return new Date(year,month-1,day,hour,min);
+  }catch(e){return null;}
+}
 
-    const pad = n => String(n).padStart(2,'0');
-    const start = `${year}${pad(month)}${pad(day)}T${pad(hour)}${pad(min)}00`;
-    const endD = new Date(year, month-1, day, hour+1, min);
-    const end = `${endD.getFullYear()}${pad(endD.getMonth()+1)}${pad(endD.getDate())}T${pad(endD.getHours())}${pad(endD.getMinutes())}00`;
+// ── 구글 캘린더 URL ──
+function buildGCalURL(title,dateStr,timeStr,location,memo){
+  const d=parseEventDate(dateStr,timeStr)||new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  const fmt=dt=>`${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}T${pad(dt.getHours())}${pad(dt.getMinutes())}00`;
+  const end=new Date(d.getTime()+60*60*1000);
+  let details='일정 메모장 앱에서 등록됨';
+  if(memo)details+='\n'+memo;
+  return`https://calendar.google.com/calendar/render?action=TEMPLATE`
+    +`&text=${encodeURIComponent(title)}`
+    +`&dates=${fmt(d)}/${fmt(end)}`
+    +`&details=${encodeURIComponent(details)}`
+    +(location?`&location=${encodeURIComponent(location)}`:'');
+}
 
-    return `https://calendar.google.com/calendar/render?action=TEMPLATE`
-      + `&text=${encodeURIComponent(title)}`
-      + `&dates=${start}/${end}`
-      + `&details=${encodeURIComponent('일정 메모장 앱에서 등록됨')}`;
-  }
-
-  function parseMemo() {
-    const raw = document.getElementById('memo-input').value.trim();
-    if (!raw) { showToast('메모를 입력해주세요'); return; }
-
-    const today = new Date();
-    const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
-    const fmt = d => `${d.getMonth()+1}월 ${d.getDate()}일`;
-
-    let title = raw, date = fmt(today), time = '오전 9:00';
-
-    const tm = raw.match(/오전\s*(\d+)시(?:\s*(\d+)분)?|오후\s*(\d+)시(?:\s*(\d+)분)?/);
-    if (tm) {
-      if (tm[1]) time = `오전 ${tm[1]}:${tm[2]||'00'}`;
-      else if (tm[3]) time = `오후 ${tm[3]}:${tm[4]||'00'}`;
-    }
-
-    if (/내일/.test(raw)) date = fmt(tomorrow);
-    else if (/오늘/.test(raw)) date = fmt(today);
-    else { const dm = raw.match(/(\d{1,2})월\s*(\d{1,2})일/); if (dm) date = `${dm[1]}월 ${dm[2]}일`; }
-
-    let t = raw.replace(/내일|오늘|\d+월\s*\d+일|오전|오후|\d+시|\d+분|알림|알려줘|예약|등록/g,'').replace(/\s+/g,' ').trim();
-    if (t.length > 1) title = t;
-
-    const alerts = getSelectedAlerts();
-    if (alerts.length === 0) { showToast('알림 시간을 하나 이상 선택해주세요'); return; }
-
-    document.getElementById('p-title').textContent = title;
-    document.getElementById('p-date').textContent = date;
-    document.getElementById('p-time').textContent = time;
-    document.getElementById('p-alert').innerHTML = alerts.map(a =>
-      `<span class="alert-tag-preview">${a.val}</span>`).join('');
-    document.getElementById('parsed-preview').classList.add('show');
-  }
-
-  function addEvent() {
-    const title = document.getElementById('p-title').textContent.trim();
-    const date  = document.getElementById('p-date').textContent.trim();
-    const time  = document.getElementById('p-time').textContent.trim();
-    const alertEls = [...document.querySelectorAll('#p-alert .alert-tag-preview')];
-    const alertLabels = alertEls.map(el => el.textContent);
-
-    // 구글 캘린더 새 탭으로 열기
-    const gcalURL = buildGCalURL(title, date, time);
-    window.open(gcalURL, '_blank');
-
-    // 카드 추가
-    colorIdx = (colorIdx + 1) % COLORS.length;
-    const savedURL = gcalURL;
-    const card = document.createElement('div');
-    card.className = 'event-card';
-    card.innerHTML = `
-      <div class="event-dot" style="background:${COLORS[colorIdx]}"></div>
+// ── 홈 일정 목록 렌더 ──
+function renderHomeEvents(){
+  const list=document.getElementById('events-list');
+  list.innerHTML='';
+  if(events.length===0){list.innerHTML='<div style="text-align:center;color:#9ca3af;font-size:13px;padding:20px 0">등록된 일정이 없어요</div>';return;}
+  [...events].reverse().forEach((ev,ri)=>{
+    const i=events.length-1-ri;
+    const card=document.createElement('div');
+    card.className='event-card';
+    const gcalURL=buildGCalURL(ev.title,ev.date,ev.time,ev.location,ev.memo);
+    card.innerHTML=`
+      <div class="event-dot" style="background:${ev.color}"></div>
       <div class="event-info">
-        <div class="event-title">${title}</div>
-        <div class="event-time">${date} · ${time}</div>
+        <div class="event-title">${ev.title}</div>
+        <div class="event-time">${ev.date} · ${ev.time}${ev.location?' · '+ev.location:''}</div>
         <div class="event-tags">
           <span class="tag tag-gcal">구글 캘린더</span>
-          ${alertLabels.map(a=>`<span class="tag tag-alert">${a}</span>`).join('')}
+          ${(ev.alerts||[]).map(a=>`<span class="tag tag-alert">${a.val}</span>`).join('')}
         </div>
       </div>
       <div class="event-btns">
-        <button class="del-btn" onclick="this.closest('.event-card').remove()">✕</button>
-        <button class="open-gcal-btn" onclick="window.open('${savedURL}','_blank')">캘린더 열기</button>
-      </div>
-    `;
-    document.getElementById('events-list').insertBefore(card, document.getElementById('events-list').firstChild);
-    document.getElementById('parsed-preview').classList.remove('show');
-    document.getElementById('memo-input').value = '';
-    document.querySelectorAll('#alert-chips .chip').forEach(c => c.classList.remove('selected'));
+        <button class="del-btn" onclick="deleteEvent(${i})">✕</button>
+        <a class="open-gcal-btn" href="${gcalURL}" target="_blank" rel="noopener">캘린더</a>
+      </div>`;
+    list.appendChild(card);
+  });
+}
 
-    const lbl = document.getElementById('gcal-label');
-    lbl.textContent = '캘린더 페이지 열림!';
-    setTimeout(() => lbl.textContent = 'Google Calendar 연동됨', 3000);
-    showToast('구글 캘린더가 열렸어요 — 저장 버튼을 눌러주세요!');
+function deleteEvent(i){
+  events.splice(i,1);saveEvents();renderHomeEvents();renderCalendar();
+}
+
+// ── 메모 파싱 ──
+function parseMemo(){
+  const raw=document.getElementById('memo-input').value.trim();
+  if(!raw){showToast('메모를 입력해주세요');return;}
+  const today=new Date(),tomorrow=new Date(today);tomorrow.setDate(today.getDate()+1);
+  const fmt=d=>`${d.getMonth()+1}월 ${d.getDate()}일`;
+  let title=raw,date=fmt(today),time='오전 9:00';
+  const tm=raw.match(/오전\s*(\d+)시(?:\s*(\d+)분)?|오후\s*(\d+)시(?:\s*(\d+)분)?/);
+  if(tm){if(tm[1])time=`오전 ${tm[1]}:${tm[2]||'00'}`;else if(tm[3])time=`오후 ${tm[3]}:${tm[4]||'00'}`;}
+  if(/내일/.test(raw))date=fmt(tomorrow);
+  else if(/오늘/.test(raw))date=fmt(today);
+  else{const dm=raw.match(/(\d{1,2})월\s*(\d{1,2})일/);if(dm)date=`${dm[1]}월 ${dm[2]}일`;}
+  let t=raw.replace(/내일|오늘|\d+월\s*\d+일|오전|오후|\d+시|\d+분|알림|알려줘|예약|등록/g,'').replace(/\s+/g,' ').trim();
+  if(t.length>1)title=t;
+  const alerts=getSelectedAlerts('alert-chips');
+  if(alerts.length===0){showToast('알림 시간을 하나 이상 선택해주세요');return;}
+  document.getElementById('p-title').textContent=title;
+  document.getElementById('p-date').textContent=date;
+  document.getElementById('p-time').textContent=time;
+  document.getElementById('p-alert').innerHTML=alerts.map(a=>`<span class="alert-tag-preview">${a.val}</span>`).join('');
+  document.getElementById('parsed-preview').classList.add('show');
+}
+
+function addEvent(){
+  const title=document.getElementById('p-title').textContent.trim();
+  const date=document.getElementById('p-date').textContent.trim();
+  const time=document.getElementById('p-time').textContent.trim();
+  const alerts=[...document.querySelectorAll('#p-alert .alert-tag-preview')].map(el=>{
+    const chip=[...document.querySelectorAll('#alert-chips .chip')].find(c=>c.dataset.val===el.textContent);
+    return{val:el.textContent,min:chip?parseInt(chip.dataset.min):60};
+  });
+  colorIdx=(colorIdx+1)%COLORS.length;
+  const ev={title,date,time,alerts,color:COLORS[colorIdx],location:'',memo:''};
+  events.push(ev);saveEvents();
+  scheduleNotifs(ev);
+  const gcalURL=buildGCalURL(title,date,time,'','');
+  pendingEvent={...ev,gcalURL};
+  document.getElementById('overlay-title').textContent=`"${title}" 등록 준비 완료!`;
+  document.getElementById('gcal-link').href=gcalURL;
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('parsed-preview').classList.remove('show');
+  document.getElementById('memo-input').value='';
+  document.querySelectorAll('#alert-chips .chip').forEach(c=>c.classList.remove('selected'));
+  document.querySelector('#alert-chips .chip[data-val="1시간 전"]').classList.add('selected');
+  renderHomeEvents();renderCalendar();
+}
+
+function closeOverlay(){
+  document.getElementById('overlay').classList.remove('show');
+  pendingEvent=null;
+  showToast('일정이 저장됐어요!');
+}
+document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)closeOverlay();});
+
+// ── 캘린더 모달 ──
+function openModal(){
+  const today=new Date();
+  document.getElementById('m-title').value='';
+  document.getElementById('m-date').value=today.toISOString().split('T')[0];
+  document.getElementById('m-time').value='09:00';
+  document.getElementById('m-location').value='';
+  document.getElementById('m-memo').value='';
+  document.querySelectorAll('#modal-chips .chip').forEach(c=>c.classList.remove('selected'));
+  document.querySelector('#modal-chips .chip[data-val="1시간 전"]').classList.add('selected');
+  document.getElementById('modal-overlay').classList.add('show');
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('show');}
+document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+function saveModalEvent(){
+  const title=document.getElementById('m-title').value.trim();
+  if(!title){showToast('제목을 입력해주세요');return;}
+  const dateVal=document.getElementById('m-date').value;
+  const timeVal=document.getElementById('m-time').value;
+  const location=document.getElementById('m-location').value.trim();
+  const memo=document.getElementById('m-memo').value.trim();
+  const alerts=getSelectedAlerts('modal-chips');
+  if(alerts.length===0){showToast('알림 시간을 하나 이상 선택해주세요');return;}
+
+  // 날짜 포맷 변환
+  const dp=dateVal.split('-');
+  const date=`${parseInt(dp[1])}월 ${parseInt(dp[2])}일`;
+  const tp=timeVal.split(':');
+  const h=parseInt(tp[0]),m=tp[1];
+  const time=h<12?`오전 ${h}:${m}`:`오후 ${h===12?12:h-12}:${m}`;
+
+  colorIdx=(colorIdx+1)%COLORS.length;
+  const ev={title,date,time,alerts,color:COLORS[colorIdx],location,memo};
+  events.push(ev);saveEvents();
+  scheduleNotifs(ev);
+
+  const gcalURL=buildGCalURL(title,date,time,location,memo);
+  closeModal();
+  document.getElementById('overlay-title').textContent=`"${title}" 등록 준비 완료!`;
+  document.getElementById('gcal-link').href=gcalURL;
+  document.getElementById('overlay').classList.add('show');
+  renderCalendar();renderHomeEvents();
+}
+
+// ── 캘린더 렌더 ──
+function renderCalendar(){
+  const label=document.getElementById('cal-month-label');
+  label.textContent=`${calYear}년 ${calMonth+1}월`;
+  const grid=document.getElementById('cal-grid');
+  grid.innerHTML='';
+  ['일','월','화','수','목','금','토'].forEach(d=>{
+    const el=document.createElement('div');
+    el.className='cal-day-label';el.textContent=d;grid.appendChild(el);
+  });
+  const first=new Date(calYear,calMonth,1);
+  const last=new Date(calYear,calMonth+1,0);
+  const today=new Date();
+  // 앞 빈칸
+  for(let i=0;i<first.getDay();i++){
+    const d=new Date(calYear,calMonth,-(first.getDay()-1-i));
+    addCalDay(grid,d,true);
   }
+  for(let d=1;d<=last.getDate();d++){
+    addCalDay(grid,new Date(calYear,calMonth,d),false);
+  }
+  // 뒷 빈칸
+  const remaining=(7-((first.getDay()+last.getDate())%7))%7;
+  for(let i=1;i<=remaining;i++) addCalDay(grid,new Date(calYear,calMonth+1,i),true);
 
-  setInterval(() => {
-    const now = new Date();
-    document.getElementById('clock').textContent =
-      `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
-  }, 1000);
+  renderCalEvents(selectedDate||today);
+}
+
+function addCalDay(grid,date,otherMonth){
+  const today=new Date();
+  const el=document.createElement('div');
+  el.className='cal-day'+(otherMonth?' other-month':'');
+  const isToday=date.toDateString()===today.toDateString();
+  const isSel=selectedDate&&date.toDateString()===selectedDate.toDateString();
+  if(isToday)el.classList.add('today');
+  if(isSel)el.classList.add('selected');
+  const num=document.createElement('div');
+  num.className='cal-day-num';num.textContent=date.getDate();
+  el.appendChild(num);
+  // 일정 점
+  const dots=getEventsForDate(date);
+  if(dots.length>0){
+    const row=document.createElement('div');row.className='cal-dot-row';
+    dots.slice(0,3).forEach(ev=>{const d=document.createElement('div');d.className='cal-dot';d.style.background=ev.color;row.appendChild(d);});
+    el.appendChild(row);
+  }
+  el.onclick=()=>{selectedDate=new Date(date);renderCalendar();};
+  grid.appendChild(el);
+}
+
+function getEventsForDate(date){
+  return events.filter(ev=>{
+    try{
+      const dm=ev.date.match(/(\d{1,2})월\s*(\d{1,2})일/);
+      if(!dm)return false;
+      return parseInt(dm[1])===date.getMonth()+1&&parseInt(dm[2])===date.getDate();
+    }catch(e){return false;}
+  });
+}
+
+function renderCalEvents(date){
+  const title=document.getElementById('cal-events-title');
+  const list=document.getElementById('cal-events-list');
+  title.textContent=`${date.getMonth()+1}월 ${date.getDate()}일 일정`;
+  list.innerHTML='';
+  const dayEvs=getEventsForDate(date);
+  if(dayEvs.length===0){list.innerHTML='<div class="no-events">이 날 일정이 없어요</div>';return;}
+  dayEvs.forEach(ev=>{
+    const gcalURL=buildGCalURL(ev.title,ev.date,ev.time,ev.location,ev.memo);
+    const item=document.createElement('div');
+    item.className='cal-event-item';
+    item.innerHTML=`
+      <div class="cal-event-dot" style="background:${ev.color}"></div>
+      <div class="cal-event-info">
+        <div class="cal-event-title">${ev.title}</div>
+        <div class="cal-event-time">${ev.time}${ev.location?' · '+ev.location:''}</div>
+        ${ev.memo?`<div class="cal-event-time" style="margin-top:2px">${ev.memo}</div>`:''}
+        <div class="cal-event-tags event-tags" style="margin-top:6px">
+          <span class="tag tag-gcal">구글 캘린더</span>
+          ${(ev.alerts||[]).map(a=>`<span class="tag tag-alert">${a.val}</span>`).join('')}
+        </div>
+      </div>
+      <a class="open-gcal-btn" href="${gcalURL}" target="_blank" rel="noopener" style="margin-top:2px">열기</a>`;
+    list.appendChild(item);
+  });
+}
+
+function changeMonth(dir){
+  calMonth+=dir;
+  if(calMonth>11){calMonth=0;calYear++;}
+  if(calMonth<0){calMonth=11;calYear--;}
+  selectedDate=null;
+  renderCalendar();
+}
+
+// ── 시계 ──
+setInterval(()=>{
+  const now=new Date();
+  document.getElementById('clock').textContent=`${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+},1000);
+
+// ── 초기화 ──
+loadEvents();
+events.forEach(ev=>scheduleNotifs(ev));
+renderHomeEvents();
 </script>
 </body>
 </html>
